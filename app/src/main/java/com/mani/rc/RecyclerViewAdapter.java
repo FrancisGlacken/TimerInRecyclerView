@@ -2,6 +2,7 @@ package com.mani.rc;
 
 import android.content.Context;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -32,7 +33,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         LayoutInflater inflater = LayoutInflater.from(context);
 
         View view = inflater.inflate(R.layout.recycler_item, parent, false);
-        ButterKnife.bind(this, view);
 
         return new ViewHolder(view);
     }
@@ -42,28 +42,26 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         holder.bind();
     }
 
+
     @Override
     public int getItemCount() {
-        return 100;
+        return 9001; // OVER 9000!!!
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        @BindView(R.id.timestamp)
-        TextView timeStamp;
-        @BindView(R.id.bck)
-        ImageView imageView;
+        TextView timeStamp = itemView.findViewById(R.id.category_card_timer);
         CustomRunnable customRunnable;
 
         public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
-            customRunnable = new CustomRunnable(handler, timeStamp, 10000, imageView);
+            customRunnable = new CustomRunnable(handler, timeStamp, SystemClock.elapsedRealtime());
         }
 
         public void bind() {
             handler.removeCallbacks(customRunnable);
             customRunnable.holder = timeStamp;
-            customRunnable.millisUntilFinished = 10000 * getAdapterPosition();
+            customRunnable.initialTime = SystemClock.elapsedRealtime() - (10000 * getAdapterPosition());
             handler.postDelayed(customRunnable, 100);
 
         }

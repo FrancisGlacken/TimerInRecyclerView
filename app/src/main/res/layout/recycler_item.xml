@@ -1,21 +1,164 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="100dp"
-                android:orientation="vertical">
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="5dp"
+    app:cardElevation="3dp"
+    android:foreground="?android:attr/selectableItemBackground">
 
-    <ImageView
-        android:id="@+id/bck"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@mipmap/ic_launcher"
-        android:visibility="gone"></ImageView>
-
-    <TextView
-
-        android:id="@+id/timestamp"
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/card_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="10"/>
-</RelativeLayout>
+        android:orientation="vertical"
+        android:transitionName="@string/category_title_transition"
+        tools:targetApi="lollipop">
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/category_card_title_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/category_title_container_background"
+            android:backgroundTint="@color/category_title_container_background"
+            android:elevation="3dp">
+
+            <!-- TODO: Fix Category Title -->
+            <TextView
+                android:id="@+id/category_card_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginRight="4dp"
+                android:layout_marginBottom="4dp"
+                android:textSize="27sp"
+                android:textColor="@color/white"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="@+id/category_card_title_container"
+                tools:text="Category" />
+
+            <TextView
+                android:id="@+id/category_card_total_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginBottom="4dp"
+                android:textColor="@color/white"
+                android:textSize="27sp"
+                app:layout_constraintBottom_toBottomOf="@+id/category_card_title_container"
+                app:layout_constraintEnd_toStartOf="@+id/detail_activity_favicon"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="0d0h0m" />
+
+            <ToggleButton
+                android:id="@+id/detail_activity_favicon"
+                android:layout_width="34dp"
+                android:layout_height="34dp"
+                android:layout_margin="8dp"
+                android:background="@drawable/ic_favorite_heart_selector"
+                android:checked="false"
+                android:text=""
+                android:textOff=""
+                android:textOn=""
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </android.support.constraint.ConstraintLayout>
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="@android:style/Widget.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:progress="25"
+            android:indeterminateDrawable="@drawable/custom_progress_bar"
+            android:progressTint="@color/primaryLightColor"
+            android:progressBackgroundTint="@color/card_body_background"/>
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/linearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:orientation="horizontal"
+            android:layout_gravity="center_horizontal"
+            android:background="@color/card_body_background">
+
+            <!-- TODO: Fix Style for timeBankValue -->
+            <TextView
+                android:id="@+id/category_card_timer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:layout_margin="8dp"
+                android:textColor="@color/total_time_text_color"
+                android:textSize="32sp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:text="@string/default_timer"/>
+
+            <ToggleButton
+                android:id="@+id/category_card_play_button"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_margin="10dp"
+                android:background="@drawable/ic_start_button_selector"
+                android:text=""
+                android:textOff=""
+                android:textOn=""
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toEndOf="@id/category_card_timer"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+            <ToggleButton
+                android:id="@+id/category_card_pause_button"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_margin="10dp"
+                android:background="@drawable/ic_pause_button_selector"
+                android:text=""
+                android:textOff=""
+                android:textOn=""
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toEndOf="@id/category_card_play_button"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+            <ToggleButton
+                android:id="@+id/category_card_reset_button"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_margin="10dp"
+                android:background="@drawable/ic_reset_button_selector"
+                android:text=""
+                android:textOff=""
+                android:textOn=""
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toEndOf="@id/category_card_pause_button"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+            <ToggleButton
+                android:id="@+id/category_card_commit_button"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_margin="10dp"
+                android:background="@drawable/ic_commit_button_selector"
+                android:text=""
+                android:textOff=""
+                android:textOn=""
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/category_card_reset_button"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </android.support.constraint.ConstraintLayout>
+    </LinearLayout>
+</android.support.v7.widget.CardView>

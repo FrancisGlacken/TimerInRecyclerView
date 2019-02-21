@@ -1,6 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+  <color name="colorPrimary">#3F51B5</color>
+  <color name="colorPrimaryDark">#303F9F</color>
+  <color name="colorAccent">#FF4081</color>
+
+
+  <!--<color name="primaryColor">#8a53e8</color>-->
+  <!--<color name="primaryLightColor">#bf82ff</color>-->
+  <!--<color name="primaryDarkColor">#5525b5</color>-->
+  <color name="primaryColor">#2f36bf</color>
+  <color name="primaryLightColor">#6d61f3</color>
+  <color name="primaryDarkColor">#000f8d</color>
+  <color name="colorBackground">#AAA</color>
+
+  <color name="secondaryColor">#2f36bf</color>
+  <color name="secondaryLightColor">#6d61f3</color>
+  <color name="secondaryDarkColor">#000f8d</color>
+
+  <color name="primaryTextColor">#ffffff</color>
+  <color name="secondaryTextColor">#8a53e8</color>
+  <color name="dark_gray">#606368</color>
+
+  <color name="category_title_container_background">#8a53e8</color>
+  <color name="background_color">#AAA</color>
+  <color name="timer_button_color">#8a53e8</color>
+  <color name="total_time_text_color">#8a53e8</color>
+  <color name="card_body_background">#ffffff</color>
+  <color name="white">#ffffff</color>
+  <color name="app_bar_background_color">#6f42c1</color>
+  <color name="bottom_nav_background_color">#6f42c1</color>
+
+  <color name="square_color_one">#8a53e8</color>
 </resources>

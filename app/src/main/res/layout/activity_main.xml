@@ -5,31 +5,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!--  <TextView
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:id="@+id/timestamp"
-          android:text="nodata"/>
-
-      <TextView
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:id="@+id/timestamp_one"
-          android:layout_below="@id/timestamp"
-          android:text="nodata"/>
-
-      <TextView
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:id="@+id/timestamp_two"
-          android:layout_below="@id/timestamp_one"
-          android:text="nodata"/>-->
-
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/recycler"
+        android:id="@+id/cardView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layoutManager="android.support.v7.widget.LinearLayoutManager"></android.support.v7.widget.RecyclerView>
+        app:layoutManager="android.support.v7.widget.LinearLayoutManager" />
 
 
 </RelativeLayout>
