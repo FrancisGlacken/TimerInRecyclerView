@@ -1,4 +1,7 @@
+EDIT-FrancisGlacken: I'm hoping to make this into a repo that allows for running timers with play/pause/reset buttons
+
 # TimerInRecyclerView
+
 Handling multiple Countdown timers in Recyclerview
 
 [![BuddyBuild](https://dashboard.buddybuild.com/api/statusImage?appID=59adee69eb2c3f00012303f4&branch=master&build=latest)](https://dashboard.buddybuild.com/apps/59adee69eb2c3f00012303f4/build/latest?branch=master)
