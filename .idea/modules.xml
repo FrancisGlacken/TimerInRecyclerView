@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/TimerInRecyclerView.iml" filepath="$PROJECT_DIR$/TimerInRecyclerView.iml" />
-      <module fileurl="file://$PROJECT_DIR$/TimerInRecyclerViewPlus.iml" filepath="$PROJECT_DIR$/TimerInRecyclerViewPlus.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
