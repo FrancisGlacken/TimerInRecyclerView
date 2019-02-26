@@ -45,12 +45,9 @@ public abstract class CategoryDatabase extends RoomDatabase {
             };
 
 
-
     private static class PopulateDbAsync extends AsyncTask<Void, Void, Void> {
         private final CategoryDao categoryDao;
         String[] defaultCategories = {"Work", "School", "Gym"};
-
-
 
         PopulateDbAsync(CategoryDatabase db) {
             categoryDao = db.categoryDao();

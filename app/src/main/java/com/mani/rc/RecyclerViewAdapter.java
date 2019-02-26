@@ -50,14 +50,14 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     @Override
     public void onBindViewHolder(@NonNull CustomViewHolder holder, int position) {
         // Note the -1 to get our position(EX: 1-3) to match the array(EX: 0-2)
-        holder.bind(position + 1);
+        holder.bind(position);
     }
 
 
     @Override
     public int getItemCount() {
         if (categories != null) {
-            return categories.size()+1;
+            return categories.size();
         } else return 0;
     }
 
