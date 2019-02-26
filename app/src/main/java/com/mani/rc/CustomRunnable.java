@@ -8,19 +8,19 @@ import android.widget.TextView;
 public class CustomRunnable implements Runnable {
 
     public long initialTime;
-    public TextView holder;
+    public TextView holderTV;
     Handler handler;
     FormatMillis form = new FormatMillis();
 
-    public CustomRunnable(Handler handler, TextView holder, long initialTime) {
+    public CustomRunnable(Handler handler, TextView holderTV, long initialTime) {
         this.handler = handler;
-        this.holder = holder;
+        this.holderTV = holderTV;
         this.initialTime = initialTime;
     }
 
     @Override
     public void run() {
-        holder.setText(form.FormatMillisIntoHMS(SystemClock.elapsedRealtime() - initialTime));
+        holderTV.setText(form.FormatMillisIntoHMS(SystemClock.elapsedRealtime() - initialTime));
         handler.postDelayed(this, 1000);
     }
 
