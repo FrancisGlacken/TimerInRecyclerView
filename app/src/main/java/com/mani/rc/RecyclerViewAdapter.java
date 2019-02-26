@@ -1,5 +1,7 @@
 package com.mani.rc;
 
+import android.arch.lifecycle.ViewModelProvider;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -11,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mani.rc.Database.Category;
 
@@ -61,6 +64,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         } else return 0;
     }
 
+
+
+
     public class CustomViewHolder extends RecyclerView.ViewHolder {
         TextView timeStamp, categoryTitle;
         Button playButton;
@@ -68,6 +74,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         Button resetButton;
         Button commitButton;
         CustomRunnable customRunnable;
+
 
         public CustomViewHolder(View itemView) {
             super(itemView);
@@ -80,20 +87,37 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             commitButton = itemView.findViewById(R.id.category_card_commit_button);
         }
 
+
+
         public void bind(int position) {
-            Category currentCategory = categories.get(position);
+
+            // Stop runnable and get currentCategory
             handler.removeCallbacks(customRunnable);
-            customRunnable.holderTV = timeStamp;
-            customRunnable.initialTime = SystemClock.elapsedRealtime() - (10000 * getAdapterPosition());
-            handler.postDelayed(customRunnable, 100);
+            final Category currentCategory = categories.get(position);
+
+            // If timer was running before, start a new one
+            if (currentCategory.isTimerRunning()) {
+                customRunnable.holderTV = timeStamp;
+                customRunnable.initialTime = SystemClock.elapsedRealtime();
+                handler.postDelayed(customRunnable, 100);
+                StartEnabledButtons();
+            } else {
+                if (currentCategory.getDisplayTime() > 0) {
+                    PauseEnabledButtons();
+                } else {
+                    DefaultEnabledButtons();
+                }
+            }
 
             categoryTitle.setText(currentCategory.getCategory());
-            DefaultEnabledButtons();
 
             playButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     StartEnabledButtons();
+                    currentCategory.setTimerRunning(true);
+                    //UpdateCategoryAction(currentCategory);
+
                 }
             });
 
@@ -101,6 +125,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 @Override
                 public void onClick(View view) {
                     PauseEnabledButtons();
+                    currentCategory.setTimerRunning(false);
                 }
             });
 
@@ -118,7 +143,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                     DefaultEnabledButtons();
                 }
             });
-        }
+        } // End bind()
 
 
         /**

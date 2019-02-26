@@ -14,6 +14,7 @@ import com.mani.rc.Database.Category;
 
 import java.util.List;
 
+//TODO: Implment listener for updating categories
 public class MainActivity extends AppCompatActivity {
 
     RecyclerView recyclerView;
