@@ -19,12 +19,17 @@ import com.mani.rc.Database.Category;
 
 import java.util.List;
 
+//TODO: Create viewmodel references or a listener
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.CustomViewHolder> {
 
     private Handler handler = new Handler();
     private List<Category> categories;
+    private MainViewModel mainVM;
+    private FormatMillis form = new FormatMillis();
+    //private MainListener listener;
 
-    public RecyclerViewAdapter() {
+    public RecyclerViewAdapter(MainViewModel mainViewModel) {
+        this.mainVM = mainViewModel;
     }
 
     public void clearAll() {
@@ -33,7 +38,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     public void setCategories(final List<Category> categories) {
         this.categories = categories;
-
         // Notifies the adapter that the underlying data has changed
         // Therefore causing the Adapter to refresh
         notifyDataSetChanged();
@@ -44,16 +48,15 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public CustomViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
-
         View view = inflater.inflate(R.layout.recycler_item, parent, false);
-
         return new CustomViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull CustomViewHolder holder, int position) {
         // Note the -1 to get our position(EX: 1-3) to match the array(EX: 0-2)
-        holder.bind(position);
+        //MainViewModel mainVM = ViewModelProviders.of(context).get(MainViewModel.class);
+        holder.bind(position, mainVM);
     }
 
 
@@ -68,6 +71,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
 
     public class CustomViewHolder extends RecyclerView.ViewHolder {
+        // TextViews, Buttons and CustomRunnable
         TextView timeStamp, categoryTitle;
         Button playButton;
         Button pauseButton;
@@ -75,11 +79,11 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         Button commitButton;
         CustomRunnable customRunnable;
 
-
+        // Constructor
         public CustomViewHolder(View itemView) {
             super(itemView);
             timeStamp = itemView.findViewById(R.id.category_card_timer);
-            customRunnable = new CustomRunnable(handler, timeStamp, SystemClock.elapsedRealtime());
+            customRunnable = new CustomRunnable(handler, timeStamp, SystemClock.elapsedRealtime(), mainVM);
             categoryTitle = itemView.findViewById(R.id.category_card_title);
             playButton = itemView.findViewById(R.id.category_card_play_button);
             pauseButton = itemView.findViewById(R.id.category_card_pause_button);
@@ -87,18 +91,25 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             commitButton = itemView.findViewById(R.id.category_card_commit_button);
         }
 
-
-
-        public void bind(int position) {
+        // Method to be run in BindViewHolder,
+        public void bind(int position, final MainViewModel viewModel) {
 
             // Stop runnable and get currentCategory
-            handler.removeCallbacks(customRunnable);
+//            long tempDisplayTime = customRunnable.getDisplayMillis();
+            if (customRunnable != null) {
+                handler.removeCallbacks(customRunnable);
+            }
+
             final Category currentCategory = categories.get(position);
+
+            categoryTitle.setText(currentCategory.getCategory());
+            timeStamp.setText(form.FormatMillisIntoHMS(currentCategory.getDisplayTime()));
 
             // If timer was running before, start a new one
             if (currentCategory.isTimerRunning()) {
                 customRunnable.holderTV = timeStamp;
-                customRunnable.initialTime = SystemClock.elapsedRealtime();
+                customRunnable.initialTime = SystemClock.elapsedRealtime() - currentCategory.getDisplayTime();
+                customRunnable.displayResultToLog = currentCategory.getCategory();
                 handler.postDelayed(customRunnable, 100);
                 StartEnabledButtons();
             } else {
@@ -109,15 +120,18 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 }
             }
 
-            categoryTitle.setText(currentCategory.getCategory());
+
 
             playButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     StartEnabledButtons();
                     currentCategory.setTimerRunning(true);
-                    //UpdateCategoryAction(currentCategory);
-
+                    customRunnable.holderTV = timeStamp;
+                    customRunnable.initialTime = SystemClock.elapsedRealtime() - currentCategory.getDisplayTime();
+                    customRunnable.displayResultToLog = currentCategory.getCategory();
+                    handler.postDelayed(customRunnable, 100);
+//                    viewModel.updateCategory(currentCategory);
                 }
             });
 
@@ -125,7 +139,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 @Override
                 public void onClick(View view) {
                     PauseEnabledButtons();
+                    handler.removeCallbacks(customRunnable);
                     currentCategory.setTimerRunning(false);
+                    currentCategory.setDisplayTime(customRunnable.getDisplayMillis());
+//                    viewModel.updateCategory(currentCategory);
                 }
             });
 
@@ -133,14 +150,16 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 @Override
                 public void onClick(View view) {
                     DefaultEnabledButtons();
-
+                    currentCategory.setTimerRunning(false);
+                    currentCategory.setDisplayTime(0);
+                    viewModel.updateCategory(currentCategory);
                 }
             });
 
             commitButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    DefaultEnabledButtons();
+                    //DefaultEnabledButtons();
                 }
             });
         } // End bind()

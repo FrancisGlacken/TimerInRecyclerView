@@ -12,7 +12,7 @@ import android.support.v7.widget.RecyclerView;
 import com.mani.rc.RecyclerViewAdapter;
 
 
-@Database(entities = {Category.class }, version = 1, exportSchema = false)
+@Database(entities = {Category.class }, version = 2, exportSchema = false)
 
 public abstract class CategoryDatabase extends RoomDatabase {
 
@@ -50,7 +50,7 @@ public abstract class CategoryDatabase extends RoomDatabase {
 
     private static class PopulateDbAsync extends AsyncTask<Void, Void, Void> {
         private final CategoryDao categoryDao;
-        String[] defaultCategories = {"Work", "School", "Gym", "Yoga", "Legend of Zelda", "Final Fantasy", "Mortal Kombat", "Street Fighter"};
+        String[] defaultCategories = {"Work", "School", "Gym", "Yoga", "Legend of Zelda", "Final Fantasy", "Mortal Kombat", "Street Fighter", "Mother 3", "Pokémon Gold", "Ninja Baseball Batmen"};
 
         PopulateDbAsync(CategoryDatabase db) {
             categoryDao = db.categoryDao();

@@ -14,12 +14,13 @@ import com.mani.rc.Database.Category;
 
 import java.util.List;
 
-//TODO: Implment listener for updating categories
-public class MainActivity extends AppCompatActivity {
+//TODO: Implement listener for updating categories
+public class MainActivity extends AppCompatActivity implements MainListener {
 
     RecyclerView recyclerView;
     RecyclerViewAdapter recyclerViewAdapter;
     MainViewModel mainVM;
+    MainListener listener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mainVM = ViewModelProviders.of(this).get(MainViewModel.class);
-        recyclerViewAdapter = new RecyclerViewAdapter();
+        recyclerViewAdapter = new RecyclerViewAdapter(mainVM);
         recyclerView = findViewById(R.id.cardView);
         recyclerView.setLayoutManager(new GridLayoutManager(getBaseContext(), 1));
         recyclerView.setAdapter(recyclerViewAdapter);
@@ -44,5 +45,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         recyclerViewAdapter.clearAll();
+    }
+
+    @Override
+    public void callback(Category category) {
+        mainVM.updateCategory(category);
     }
 }
