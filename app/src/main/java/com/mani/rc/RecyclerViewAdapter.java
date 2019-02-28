@@ -3,10 +3,13 @@ package com.mani.rc;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +20,7 @@ import android.widget.Toast;
 
 import com.mani.rc.Database.Category;
 
+import java.util.ArrayList;
 import java.util.List;
 
 //TODO: Create viewmodel references or a listener
@@ -26,21 +30,31 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     private List<Category> categories;
     private MainViewModel mainVM;
     private FormatMillis form = new FormatMillis();
+    private boolean isNotifyDataSetChangedHappened;
+    private static String isNotifyDataSetChangedHappenedKey = "com.mani.rc.isNotifyDataSetChangedHappenedKey";
+    private Context context;
+
+    private final static String TAG = "RecyclerViewAdapter";
     //private MainListener listener;
 
-    public RecyclerViewAdapter(MainViewModel mainViewModel) {
+    public RecyclerViewAdapter(MainViewModel mainViewModel, Context mainContext) {
         this.mainVM = mainViewModel;
+        categories = new ArrayList<>();
+        this.context = mainContext;
     }
 
     public void clearAll() {
         handler.removeCallbacksAndMessages(null);
     }
 
-    public void setCategories(final List<Category> categories) {
-        this.categories = categories;
-        // Notifies the adapter that the underlying data has changed
-        // Therefore causing the Adapter to refresh
-        notifyDataSetChanged();
+    public void setCategories(final List<Category> newCategories, boolean isNotifyDataSetChangedHappened) {
+        this.categories = newCategories;
+        if (!isNotifyDataSetChangedHappened) {
+            SharedPreferences prefs = context.getSharedPreferences("shared_preferences", context.MODE_PRIVATE);
+            prefs.edit().putBoolean(isNotifyDataSetChangedHappenedKey, true).apply();
+            Log.e(TAG, "notifyDataSetChanged Called");
+            notifyDataSetChanged();
+        }
     }
 
     @NonNull
@@ -68,8 +82,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     }
 
 
-
-
     public class CustomViewHolder extends RecyclerView.ViewHolder {
         // TextViews, Buttons and CustomRunnable
         TextView timeStamp, categoryTitle;
@@ -92,10 +104,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         }
 
         // Method to be run in BindViewHolder,
-        public void bind(int position, final MainViewModel viewModel) {
+        public void bind(final int position, final MainViewModel viewModel) {
 
             // Stop runnable and get currentCategory
-//            long tempDisplayTime = customRunnable.getDisplayMillis();
             if (customRunnable != null) {
                 handler.removeCallbacks(customRunnable);
             }
@@ -120,18 +131,19 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 }
             }
 
-
-
             playButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     StartEnabledButtons();
                     currentCategory.setTimerRunning(true);
+                    categories.set(position, currentCategory);
                     customRunnable.holderTV = timeStamp;
                     customRunnable.initialTime = SystemClock.elapsedRealtime() - currentCategory.getDisplayTime();
                     customRunnable.displayResultToLog = currentCategory.getCategory();
                     handler.postDelayed(customRunnable, 100);
-//                    viewModel.updateCategory(currentCategory);
+                    viewModel.updateCategory(currentCategory);
+                    notifyItemChanged(position, "payload " + position);
+
                 }
             });
 
@@ -141,8 +153,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                     PauseEnabledButtons();
                     handler.removeCallbacks(customRunnable);
                     currentCategory.setTimerRunning(false);
+                    categories.set(position, currentCategory);
                     currentCategory.setDisplayTime(customRunnable.getDisplayMillis());
-//                    viewModel.updateCategory(currentCategory);
+                    viewModel.updateCategory(currentCategory);
+                    notifyItemChanged(position, "payload " + position);
                 }
             });
 
@@ -151,8 +165,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 public void onClick(View view) {
                     DefaultEnabledButtons();
                     currentCategory.setTimerRunning(false);
+                    categories.set(position, currentCategory);
                     currentCategory.setDisplayTime(0);
                     viewModel.updateCategory(currentCategory);
+                    notifyItemChanged(position, "payload " + position);
                 }
             });
 
@@ -194,3 +210,33 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         }
     }
 }
+
+// Alternative to .notifyDataSetChanged()
+//        // Get a list of the old categories and then make a new list if newCategories has value
+//        final List<Category> oldCategories = new ArrayList<>(this.categories);
+//        this.categories.clear();
+//        if (newCategories != null) {
+//            this.categories.addAll(newCategories);
+//        }
+//
+//        DiffUtil.calculateDiff(new DiffUtil.Callback() {
+//            @Override
+//            public int getOldListSize() {
+//                return oldCategories.size();
+//            }
+//
+//            @Override
+//            public int getNewListSize() {
+//                return newCategories.size();
+//            }
+//
+//            @Override
+//            public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+//                return oldCategories.get(oldItemPosition).equals(newCategories.get(newItemPosition));
+//            }
+//
+//            @Override
+//            public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+//                return oldCategories.get(oldItemPosition).equals(newCategories.get(newItemPosition));
+//            }
+//        }).dispatchUpdatesTo(this);

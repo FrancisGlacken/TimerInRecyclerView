@@ -29,10 +29,13 @@ public class CustomRunnable implements Runnable {
 
     @Override
     public void run() {
+        android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
+
         displayMillis = SystemClock.elapsedRealtime() - initialTime;
         holderTV.setText(form.FormatMillisIntoHMS(displayMillis));
         Log.e(TAG, "CustomRunnable--" + displayResultToLog + " DisplayTime: " + form.FormatMillisIntoHMS(SystemClock.elapsedRealtime() - initialTime));
         handler.postDelayed(this, 1000);
+
     }
 
     public long getDisplayMillis() {
