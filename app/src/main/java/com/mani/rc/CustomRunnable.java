@@ -2,26 +2,45 @@ package com.mani.rc;
 
 import android.os.Handler;
 import android.os.SystemClock;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.mani.rc.Database.Category;
 
 public class CustomRunnable implements Runnable {
 
     public long initialTime;
+    public long displayMillis;
     public TextView holderTV;
-    Handler handler;
-    FormatMillis form = new FormatMillis();
+    public String displayResultToLog;
+    MainViewModel mainVM;
 
-    public CustomRunnable(Handler handler, TextView holderTV, long initialTime) {
+    private Handler handler;
+    private FormatMillis form = new FormatMillis();
+    private final static String TAG = "CustomRunnable";
+
+    public CustomRunnable(Handler handler, TextView holderTV, long initialTime, MainViewModel mainVM) {
         this.handler = handler;
         this.holderTV = holderTV;
         this.initialTime = initialTime;
+        this.mainVM = mainVM;
     }
 
     @Override
     public void run() {
-        holderTV.setText(form.FormatMillisIntoHMS(SystemClock.elapsedRealtime() - initialTime));
+        android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
+
+        displayMillis = SystemClock.elapsedRealtime() - initialTime;
+        holderTV.setText(form.FormatMillisIntoHMS(displayMillis));
+        Log.e(TAG, "CustomRunnable--" + displayResultToLog + " DisplayTime: " + form.FormatMillisIntoHMS(SystemClock.elapsedRealtime() - initialTime));
         handler.postDelayed(this, 1000);
+
     }
+
+    public long getDisplayMillis() {
+        return displayMillis;
+    }
+
 
 }
