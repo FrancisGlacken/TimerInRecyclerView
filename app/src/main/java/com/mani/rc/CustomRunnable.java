@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import com.mani.rc.Database.Category;
 
+// This is unused in the app, I basically moved the whole thing back into the adapter because it was easier to work with
 public class CustomRunnable implements Runnable {
 
     public long initialTime;

@@ -114,7 +114,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             // If timer was running before, start a new one
             if (currentCategory.isTimerRunning()) {
                 ultimateRunnable.holderTV = timeStamp;
-                ultimateRunnable.initialTime = SystemClock.elapsedRealtime() - currentCategory.getDisplayTime();
+                long timeAfterLife = SystemClock.elapsedRealtime() - currentCategory.getTimeAtDeath();
+                ultimateRunnable.initialTime = SystemClock.elapsedRealtime() - currentCategory.getDisplayTime() - timeAfterLife;
                 ultimateRunnable.displayResultToLog = currentCategory.getCategory();
                 ultimateRunnable.currentCategory = currentCategory;
                 ultimateRunnable.position = position;
@@ -134,15 +135,16 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                     StartEnabledButtons();
                     currentCategory.setTimerRunning(true);
                     categories.set(position, currentCategory);
+
                     ultimateRunnable.holderTV = timeStamp;
                     ultimateRunnable.initialTime = SystemClock.elapsedRealtime() - currentCategory.getDisplayTime();
                     ultimateRunnable.displayResultToLog = currentCategory.getCategory();
                     ultimateRunnable.currentCategory = currentCategory;
                     ultimateRunnable.position = position;
                     handler.postDelayed(ultimateRunnable, 100);
-                    viewModel.updateCategory(currentCategory);
-                    notifyItemChanged(position, "payload " + position);
 
+                    // Update category
+                    viewModel.updateCategory(currentCategory);
                 }
             });
 
@@ -153,8 +155,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                     handler.removeCallbacks(ultimateRunnable);
                     currentCategory.setTimerRunning(false);
                     categories.set(position, currentCategory);
+
+                    // Update category and redraw card
                     viewModel.updateCategory(currentCategory);
-                    notifyItemChanged(position, "payload " + position);
                 }
             });
 
@@ -164,9 +167,11 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                     DefaultEnabledButtons();
                     currentCategory.setTimerRunning(false);
                     currentCategory.setDisplayTime(0);
+                    currentCategory.setTimeAtDeath(0);
                     categories.set(position, currentCategory);
+
+                    // Update category and redraw card
                     viewModel.updateCategory(currentCategory);
-                    notifyItemChanged(position, "payload " + position);
                 }
             });
 
@@ -208,6 +213,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         }
     }
 
+    // Runnable that updates the timerView text, the value in categories and the category database table every tick
     public class UltimateRunnable implements Runnable {
 
         private Handler handler;
@@ -228,6 +234,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             this.initialTime = initialTime;
         }
 
+        //Unused
         public UltimateRunnable(Handler handler, TextView holderTV, long initialTime, Category currentCategory, int position) {
             this.handler = handler;
             this.holderTV = holderTV;
@@ -242,6 +249,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             displayMillis = SystemClock.elapsedRealtime() - initialTime;
             holderTV.setText(form.FormatMillisIntoHMS(displayMillis));
             currentCategory.setDisplayTime(displayMillis);
+            currentCategory.setTimeAtDeath(SystemClock.elapsedRealtime());
             categories.set(position, currentCategory);
             mainVM.updateCategory(currentCategory);
 
@@ -254,7 +262,12 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
 
 
-// Alternative to .notifyDataSetChanged()
+// Alternatives to .notifyDataSetChanged()
+
+// notifyItemChanged(position, "payload " + position);
+
+//   or
+
 //        // Get a list of the old categories and then make a new list if newCategories has value
 //        final List<Category> oldCategories = new ArrayList<>(this.categories);
 //        this.categories.clear();
