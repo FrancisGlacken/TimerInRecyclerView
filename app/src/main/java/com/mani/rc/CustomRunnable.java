@@ -14,22 +14,20 @@ public class CustomRunnable implements Runnable {
     public long displayMillis;
     public TextView holderTV;
     public String displayResultToLog;
-    MainViewModel mainVM;
 
     private Handler handler;
     private FormatMillis form = new FormatMillis();
     private final static String TAG = "CustomRunnable";
 
-    public CustomRunnable(Handler handler, TextView holderTV, long initialTime, MainViewModel mainVM) {
+    public CustomRunnable(Handler handler, TextView holderTV, long initialTime) {
         this.handler = handler;
         this.holderTV = holderTV;
         this.initialTime = initialTime;
-        this.mainVM = mainVM;
     }
 
     @Override
     public void run() {
-        android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
+        //android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
 
         displayMillis = SystemClock.elapsedRealtime() - initialTime;
         holderTV.setText(form.FormatMillisIntoHMS(displayMillis));
@@ -41,6 +39,4 @@ public class CustomRunnable implements Runnable {
     public long getDisplayMillis() {
         return displayMillis;
     }
-
-
 }

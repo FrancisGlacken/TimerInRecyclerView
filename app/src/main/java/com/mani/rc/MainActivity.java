@@ -20,10 +20,7 @@ public class MainActivity extends AppCompatActivity implements MainListener {
     RecyclerView recyclerView;
     RecyclerViewAdapter recyclerViewAdapter;
     MainViewModel mainVM;
-    MainListener listener;
-    SharedPreferences prefs;
     public boolean isNotifyDataSetChangedHappened;
-    public static String isNotifyDataSetChangedHappenedKey = "com.mani.rc.isNotifyDataSetChangedHappenedKey";
     private final static String TAG = "MainActivity";
 
     @Override
@@ -31,7 +28,7 @@ public class MainActivity extends AppCompatActivity implements MainListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        prefs = getSharedPreferences("shared_preferences", MODE_PRIVATE);
+        isNotifyDataSetChangedHappened = false;
         mainVM = ViewModelProviders.of(this).get(MainViewModel.class);
         recyclerViewAdapter = new RecyclerViewAdapter(mainVM, this);
         recyclerView = findViewById(R.id.cardView);
@@ -41,8 +38,11 @@ public class MainActivity extends AppCompatActivity implements MainListener {
         mainVM.getAllCategories().observe(this, new Observer<List<Category>>() {
             @Override
             public void onChanged(@Nullable List<Category> categories) {
-                isNotifyDataSetChangedHappened = prefs.getBoolean(isNotifyDataSetChangedHappenedKey, false);
-                recyclerViewAdapter.setCategories(categories, isNotifyDataSetChangedHappened);
+                // This will call .notifyDataSetChanged to populate the recyclerView ONCE per Main onCreate
+                if (!isNotifyDataSetChangedHappened) {
+                    recyclerViewAdapter.setCategories(categories);
+                    isNotifyDataSetChangedHappened = true;
+                }
             }
         });
     }
@@ -51,14 +51,12 @@ public class MainActivity extends AppCompatActivity implements MainListener {
     protected void onPause() {
         super.onPause();
         recyclerViewAdapter.clearAll();
-        prefs.edit().putBoolean(isNotifyDataSetChangedHappenedKey, false).apply();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         recyclerViewAdapter.clearAll();
-        prefs.edit().putBoolean(isNotifyDataSetChangedHappenedKey, false).apply();
     }
 
     @Override
