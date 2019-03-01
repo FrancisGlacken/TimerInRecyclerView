@@ -12,7 +12,7 @@ import android.support.v7.widget.RecyclerView;
 import com.mani.rc.RecyclerViewAdapter;
 
 
-@Database(entities = {Category.class }, version = 2, exportSchema = false)
+@Database(entities = {Category.class }, version = 3, exportSchema = false)
 
 public abstract class CategoryDatabase extends RoomDatabase {
 
@@ -61,7 +61,7 @@ public abstract class CategoryDatabase extends RoomDatabase {
             // format class object
             if(categoryDao.getAnyCategory().length < 1) {
                 for(int i = 0; i <= defaultCategories.length - 1; i++) {
-                    Category category = new Category(defaultCategories[i], 0, 0, "00:00 AM", false, false);
+                    Category category = new Category(defaultCategories[i], 0, 0, 0, "00:00 AM", false, false);
                     categoryDao.insertCategory(category);
                 }
             }

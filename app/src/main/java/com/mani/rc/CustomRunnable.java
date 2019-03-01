@@ -8,28 +8,27 @@ import android.widget.TextView;
 
 import com.mani.rc.Database.Category;
 
+// This is unused in the app, I basically moved the whole thing back into the adapter because it was easier to work with
 public class CustomRunnable implements Runnable {
 
     public long initialTime;
     public long displayMillis;
     public TextView holderTV;
     public String displayResultToLog;
-    MainViewModel mainVM;
 
     private Handler handler;
     private FormatMillis form = new FormatMillis();
     private final static String TAG = "CustomRunnable";
 
-    public CustomRunnable(Handler handler, TextView holderTV, long initialTime, MainViewModel mainVM) {
+    public CustomRunnable(Handler handler, TextView holderTV, long initialTime) {
         this.handler = handler;
         this.holderTV = holderTV;
         this.initialTime = initialTime;
-        this.mainVM = mainVM;
     }
 
     @Override
     public void run() {
-        android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
+        //android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
 
         displayMillis = SystemClock.elapsedRealtime() - initialTime;
         holderTV.setText(form.FormatMillisIntoHMS(displayMillis));
@@ -41,6 +40,4 @@ public class CustomRunnable implements Runnable {
     public long getDisplayMillis() {
         return displayMillis;
     }
-
-
 }

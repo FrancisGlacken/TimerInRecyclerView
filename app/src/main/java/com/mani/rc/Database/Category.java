@@ -28,6 +28,9 @@ public class Category {
     @ColumnInfo(name = "displayTime")
     private long displayTime;
 
+    @ColumnInfo(name = "timeAtDeath")
+    private long timeAtDeath;
+
     @ColumnInfo(name = "startTime")
     private String startTime;
 
@@ -43,20 +46,22 @@ public class Category {
      */
 
     @Ignore
-    public Category(String category, long totalTime, long displayTime, String startTime, boolean timerRunning, boolean isFavorite) {
+    public Category(String category, long totalTime, long displayTime, long timeAtDeath, String startTime, boolean timerRunning, boolean isFavorite) {
         this.category = category;
         this.totalTime = totalTime;
         this.displayTime = displayTime;
+        this.timeAtDeath = timeAtDeath;
         this.timerRunning = timerRunning;
         this.startTime = startTime;
         this.isFavorite = isFavorite;
     }
 
-    public Category(int id, @NonNull String category, long totalTime, long displayTime, String startTime, boolean timerRunning, boolean isFavorite) {
+    public Category(int id, @NonNull String category, long totalTime, long displayTime, long timeAtDeath, String startTime, boolean timerRunning, boolean isFavorite) {
         this.id = id;
         this.category = category;
         this.totalTime = totalTime;
         this.displayTime = displayTime;
+        this.timeAtDeath = timeAtDeath;
         this.startTime = startTime;
         this.timerRunning = timerRunning;
         this.isFavorite = isFavorite;
@@ -104,6 +109,14 @@ public class Category {
 
     public void setDisplayTime(long displayTime) {
         this.displayTime = displayTime;
+    }
+
+    public long getTimeAtDeath() {
+        return timeAtDeath;
+    }
+
+    public void setTimeAtDeath(long timeAtDeath) {
+        this.timeAtDeath = timeAtDeath;
     }
 
     //startTime

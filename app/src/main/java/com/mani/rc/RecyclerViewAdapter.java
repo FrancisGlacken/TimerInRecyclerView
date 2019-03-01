@@ -2,6 +2,7 @@ package com.mani.rc;
 
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
+import android.arch.persistence.room.Ignore;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Handler;
@@ -30,8 +31,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     private List<Category> categories;
     private MainViewModel mainVM;
     private FormatMillis form = new FormatMillis();
-    private boolean isNotifyDataSetChangedHappened;
-    private static String isNotifyDataSetChangedHappenedKey = "com.mani.rc.isNotifyDataSetChangedHappenedKey";
     private Context context;
 
     private final static String TAG = "RecyclerViewAdapter";
@@ -47,14 +46,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         handler.removeCallbacksAndMessages(null);
     }
 
-    public void setCategories(final List<Category> newCategories, boolean isNotifyDataSetChangedHappened) {
+    public void setCategories(final List<Category> newCategories) {
         this.categories = newCategories;
-        if (!isNotifyDataSetChangedHappened) {
-            SharedPreferences prefs = context.getSharedPreferences("shared_preferences", context.MODE_PRIVATE);
-            prefs.edit().putBoolean(isNotifyDataSetChangedHappenedKey, true).apply();
-            Log.e(TAG, "notifyDataSetChanged Called");
-            notifyDataSetChanged();
-        }
+        Log.e(TAG, "notifyDataSetChanged Called");
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -89,13 +84,13 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         Button pauseButton;
         Button resetButton;
         Button commitButton;
-        CustomRunnable customRunnable;
+        UltimateRunnable ultimateRunnable;
 
         // Constructor
         public CustomViewHolder(View itemView) {
             super(itemView);
             timeStamp = itemView.findViewById(R.id.category_card_timer);
-            customRunnable = new CustomRunnable(handler, timeStamp, SystemClock.elapsedRealtime(), mainVM);
+            ultimateRunnable = new UltimateRunnable(handler, timeStamp, SystemClock.elapsedRealtime());
             categoryTitle = itemView.findViewById(R.id.category_card_title);
             playButton = itemView.findViewById(R.id.category_card_play_button);
             pauseButton = itemView.findViewById(R.id.category_card_pause_button);
@@ -107,8 +102,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         public void bind(final int position, final MainViewModel viewModel) {
 
             // Stop runnable and get currentCategory
-            if (customRunnable != null) {
-                handler.removeCallbacks(customRunnable);
+            if (ultimateRunnable != null) {
+                handler.removeCallbacks(ultimateRunnable);
             }
 
             final Category currentCategory = categories.get(position);
@@ -118,10 +113,13 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
             // If timer was running before, start a new one
             if (currentCategory.isTimerRunning()) {
-                customRunnable.holderTV = timeStamp;
-                customRunnable.initialTime = SystemClock.elapsedRealtime() - currentCategory.getDisplayTime();
-                customRunnable.displayResultToLog = currentCategory.getCategory();
-                handler.postDelayed(customRunnable, 100);
+                ultimateRunnable.holderTV = timeStamp;
+                long timeAfterLife = SystemClock.elapsedRealtime() - currentCategory.getTimeAtDeath();
+                ultimateRunnable.initialTime = SystemClock.elapsedRealtime() - currentCategory.getDisplayTime() - timeAfterLife;
+                ultimateRunnable.displayResultToLog = currentCategory.getCategory();
+                ultimateRunnable.currentCategory = currentCategory;
+                ultimateRunnable.position = position;
+                handler.postDelayed(ultimateRunnable, 100);
                 StartEnabledButtons();
             } else {
                 if (currentCategory.getDisplayTime() > 0) {
@@ -137,13 +135,16 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                     StartEnabledButtons();
                     currentCategory.setTimerRunning(true);
                     categories.set(position, currentCategory);
-                    customRunnable.holderTV = timeStamp;
-                    customRunnable.initialTime = SystemClock.elapsedRealtime() - currentCategory.getDisplayTime();
-                    customRunnable.displayResultToLog = currentCategory.getCategory();
-                    handler.postDelayed(customRunnable, 100);
-                    viewModel.updateCategory(currentCategory);
-                    notifyItemChanged(position, "payload " + position);
 
+                    ultimateRunnable.holderTV = timeStamp;
+                    ultimateRunnable.initialTime = SystemClock.elapsedRealtime() - currentCategory.getDisplayTime();
+                    ultimateRunnable.displayResultToLog = currentCategory.getCategory();
+                    ultimateRunnable.currentCategory = currentCategory;
+                    ultimateRunnable.position = position;
+                    handler.postDelayed(ultimateRunnable, 100);
+
+                    // Update category
+                    viewModel.updateCategory(currentCategory);
                 }
             });
 
@@ -151,12 +152,12 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 @Override
                 public void onClick(View view) {
                     PauseEnabledButtons();
-                    handler.removeCallbacks(customRunnable);
+                    handler.removeCallbacks(ultimateRunnable);
                     currentCategory.setTimerRunning(false);
                     categories.set(position, currentCategory);
-                    currentCategory.setDisplayTime(customRunnable.getDisplayMillis());
+
+                    // Update category and redraw card
                     viewModel.updateCategory(currentCategory);
-                    notifyItemChanged(position, "payload " + position);
                 }
             });
 
@@ -165,10 +166,12 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 public void onClick(View view) {
                     DefaultEnabledButtons();
                     currentCategory.setTimerRunning(false);
-                    categories.set(position, currentCategory);
                     currentCategory.setDisplayTime(0);
+                    currentCategory.setTimeAtDeath(0);
+                    categories.set(position, currentCategory);
+
+                    // Update category and redraw card
                     viewModel.updateCategory(currentCategory);
-                    notifyItemChanged(position, "payload " + position);
                 }
             });
 
@@ -209,9 +212,62 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             commitButton.setEnabled(false);
         }
     }
+
+    // Runnable that updates the timerView text, the value in categories and the category database table every tick
+    public class UltimateRunnable implements Runnable {
+
+        private Handler handler;
+        private TextView holderTV;
+        private long initialTime;
+        private Category currentCategory;
+        private int position;
+
+        private long displayMillis;
+        private String displayResultToLog;
+        private FormatMillis form = new FormatMillis();
+        private final static String TAG = "CustomRunnable";
+
+        @Ignore
+        public UltimateRunnable(Handler handler, TextView holderTV, long initialTime) {
+            this.handler = handler;
+            this.holderTV = holderTV;
+            this.initialTime = initialTime;
+        }
+
+        //Unused
+        public UltimateRunnable(Handler handler, TextView holderTV, long initialTime, Category currentCategory, int position) {
+            this.handler = handler;
+            this.holderTV = holderTV;
+            this.initialTime = initialTime;
+            this.currentCategory = currentCategory;
+            this.position = position;
+        }
+
+        @Override
+        public void run() {
+            //android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
+            displayMillis = SystemClock.elapsedRealtime() - initialTime;
+            holderTV.setText(form.FormatMillisIntoHMS(displayMillis));
+            currentCategory.setDisplayTime(displayMillis);
+            currentCategory.setTimeAtDeath(SystemClock.elapsedRealtime());
+            categories.set(position, currentCategory);
+            mainVM.updateCategory(currentCategory);
+
+            Log.e(TAG, "CustomRunnable--" + displayResultToLog + " DisplayTime: " + form.FormatMillisIntoHMS(SystemClock.elapsedRealtime() - initialTime));
+            handler.postDelayed(this, 1000);
+
+        }
+    }
 }
 
-// Alternative to .notifyDataSetChanged()
+
+
+// Alternatives to .notifyDataSetChanged()
+
+// notifyItemChanged(position, "payload " + position);
+
+//   or
+
 //        // Get a list of the old categories and then make a new list if newCategories has value
 //        final List<Category> oldCategories = new ArrayList<>(this.categories);
 //        this.categories.clear();
