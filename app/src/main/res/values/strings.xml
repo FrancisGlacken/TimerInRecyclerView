@@ -13,13 +13,11 @@
     <string name="add_category_fragment_create">Create</string>
     <string name="add_category_fragment_cancel">Cancel</string>
 
-    <!-- CardView -->
-    <string name="default_timer">00:00:00</string>
-
     <!-- Commit Button -->
     <string name="commit_button">Commit</string>
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="category_title_transition">category_title_transition</string>
     <string name="bottom_nav_timer">Timer</string>
+    <string name="default_timer">00:00:00</string>
 </resources>

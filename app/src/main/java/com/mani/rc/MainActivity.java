@@ -10,12 +10,13 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 
 import com.mani.rc.Database.Category;
 
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements MainListener {
+public class MainActivity extends AppCompatActivity {
 
     RecyclerView recyclerView;
     RecyclerViewAdapter recyclerViewAdapter;
@@ -50,17 +51,14 @@ public class MainActivity extends AppCompatActivity implements MainListener {
     @Override
     protected void onPause() {
         super.onPause();
-        recyclerViewAdapter.clearAll();
+        Log.e(TAG, "onPause: Called");
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         recyclerViewAdapter.clearAll();
+        Log.e(TAG, "onDestroy: Called");
     }
 
-    @Override
-    public void callback(Category category) {
-        mainVM.updateCategory(category);
-    }
 }
