@@ -168,6 +168,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                     currentCategory.setTimerRunning(false);
                     currentCategory.setDisplayTime(0);
                     currentCategory.setTimeAtDeath(0);
+                    timeStamp.setText(R.string.default_timer);
                     categories.set(position, currentCategory);
 
                     // Update category and redraw card
