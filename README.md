@@ -1,4 +1,4 @@
-EDIT-FrancisGlacken: I'm hoping to make this into a repo that allows for running timers with play/pause/reset buttons
+Edit: Francis Glacken - I believe I have succesfully adapted the code into a recycler view full of stop watches with play/pause/reset button functionality. There's unused buttons and the code could be much cleaner but I think I got what I needed.
 
 # TimerInRecyclerView
 
